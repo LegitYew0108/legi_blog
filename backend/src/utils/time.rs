@@ -1,7 +1,7 @@
 use tracing::error;
-use tokio::sync::{mpsc, oneshot};
+use tokio::sync::mpsc;
 use chrono::prelude::*;
-use uuid::{NoContext, Timestamp, DateTime, Uuid};
+use uuid::{NoContext, Timestamp, Uuid};
 
 use crate::definitions::{GetTimeQuery,TimeandUUID};
 
@@ -24,6 +24,8 @@ pub async fn get_time_and_uuid_task(rx: &mut mpsc::Receiver<GetTimeQuery>){
         let id = Uuid::new_v7(ts);
 
         let time_and_uuid = TimeandUUID{time: utc_datetime,uuid:id};
-        query.tx.send(Ok(time_and_uuid));
+        if let Err(_) = query.tx.send(Ok(time_and_uuid)){
+            error!("Failed to send the result back to the caller.");
+        }
     }
 }
