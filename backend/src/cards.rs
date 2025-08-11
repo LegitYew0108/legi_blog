@@ -7,6 +7,7 @@ use axum::{
 };
 
 #[axum::debug_handler]
+#[tracing::instrument(name="serve_cards")]
 pub async fn serve_cards()->Result<Response,StatusCode>{
     info!("cards fetch occured!");
     let Ok(cards) = fetch_cards().await else{

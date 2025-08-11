@@ -1,6 +1,7 @@
 mod cards;
 pub mod definitions;
 mod post_articles;
+mod utils;
 
 use tracing::info;
 use axum::{
@@ -13,14 +14,6 @@ use tokio::sync::{mpsc,oneshot};
 use chrono::prelude::*;
 use uuid::{NoContext, Timestamp, Uuid};
 
-struct TimeandUUID{
-    time: DateTime<Utc>,
-    uuid: Uuid,
-}
-
-struct GetTimeQuery{
-    tx: oneshot::Sender<Result<TimeandUUID,std::io::Error>>,
-}
 
 #[tokio::main]
 async fn main() -> Result<(),std::io::Error>{
@@ -28,20 +21,18 @@ async fn main() -> Result<(),std::io::Error>{
         .init();
     info!("Server started");
 
+    let (tx, mut rx) = mpsc::channel::<definitions::GetTimeQuery>(32);
+    let time_get_task = tokio::spawn(utils::time::get_time_and_uuid_task(&mut rx));
+
     let app = Router::new()
         .route("/", get(||async {"Server active!"}))
         // データの取得系
         .route("/cards", get(cards::serve_cards))
         // データの投稿系
-        .route("/add_article",post(post_articles::add_article));
+        .route("/add_article",post(post_articles::add_article))
+        .route("/add_tag",post(post_articles::add_tag));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3440").await.unwrap();
     axum::serve(listener,app).await.unwrap();
     Ok(())
-}
-
-async fn get_time_and_uuid(rx: &mut mpsc::Receiver<GetTimeQuery>){
-    loop{
-        let query = rx.recv().await;
-    }
 }

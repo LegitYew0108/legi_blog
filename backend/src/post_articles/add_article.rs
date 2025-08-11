@@ -1,5 +1,8 @@
 use crate::post_articles::definitions;
+use axum::http::StatusCode;
 
-pub async fn add_article(){
+#[tracing::instrument(name="add_article")]
+pub async fn add_article()->StatusCode{
 
+    return StatusCode::OK;
 }
