@@ -31,3 +31,10 @@ pub struct TimeandUUID{
 pub struct GetTimeQuery{
     pub tx: oneshot::Sender<Result<TimeandUUID,std::io::Error>>,
 }
+
+#[derive(Serialize,Deserialize,Debug)]
+pub struct PostArticle{
+    title: String,
+    tags: Vec<TagID>,
+    article: String,
+}
