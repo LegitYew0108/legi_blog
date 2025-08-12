@@ -1,2 +1,2 @@
-pub mod get_articles;
+pub mod get_article;
 pub mod cards;
