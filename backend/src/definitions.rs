@@ -13,14 +13,9 @@ pub struct CardData{
 }
 
 #[derive(Serialize,Deserialize)]
-pub struct TagID{
-    uuid: String,
-}
-
-#[derive(Serialize,Deserialize)]
 pub struct Tag{
+    id: String,
     name: String,
-    id: TagID,
 }
 
 pub struct TimeandUUID{
@@ -35,6 +30,30 @@ pub struct GetTimeQuery{
 #[derive(Serialize,Deserialize,Debug)]
 pub struct PostArticle{
     title: String,
-    tags: Vec<TagID>,
+    tags: Vec<String>,
     article: String,
+}
+
+#[derive(Serialize,Deserialize)]
+pub enum AbstractType{
+    None,
+    Manual(String),
+    Auto(Option<String>),
+}
+
+#[derive(Serialize,Deserialize)]
+pub struct ArticleMetadata{
+    pub title: String,
+    pub tags: Vec<String>,
+    pub timestamp: String,
+    pub abstract_sentense: AbstractType,
+    pub main_image: Option<String>,
+}
+
+#[derive(Serialize,Deserialize)]
+pub struct ArticlePayload{
+    #[serde(rename = "_id", skip_serializing)]
+    pub id: String,
+    pub metadata: ArticleMetadata,
+    pub article: String,
 }

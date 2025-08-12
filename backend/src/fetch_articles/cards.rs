@@ -1,4 +1,4 @@
-use crate::definitions::CardData;
+use crate::definitions::{ArticleMetadata,AbstractType};
 use serde_json::json;
 use tracing::{debug, info, error};
 use axum::{
@@ -20,13 +20,13 @@ pub async fn serve_cards()->Result<Response,StatusCode>{
 }
 
 /// fetch cards and 
-async fn fetch_cards()->Result<Vec<CardData>,std::io::Error>{
+async fn fetch_cards()->Result<Vec<ArticleMetadata>,std::io::Error>{
     // TODO: use DB
     let data = vec![
-        CardData{article_id:"0001".to_string(), image_url:"https://placehold.jp/1920x1080.png".to_string(), title:"タイトル".to_string(), timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:"Response from server".to_string()},
-        CardData{article_id:"0002".to_string(), image_url:"https://placehold.jp/1920x1080.png".to_string(), title:"タイトル".to_string(), timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:"サーバーからのレスポンスだよ".to_string()},
-        CardData{article_id:"0003".to_string(), image_url:"https://placehold.jp/1920x1080.png".to_string(), title:"タイトル".to_string(), timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:"Response from server".to_string()},
-        CardData{article_id:"0004".to_string(), image_url:"https://placehold.jp/1920x1080.png".to_string(), title:"タイトル".to_string(), timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:"サーバーからのレスポンスだよ".to_string()},
+        ArticleMetadata{title:"タイトル".to_string(),tags:vec!["aaa".to_string()], timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:AbstractType::Manual("Response from server".to_string()),main_image:Some("https://placehold.jp/1920x1080.png".to_string())},
+        ArticleMetadata{title:"タイトル".to_string(),tags:vec!["aaa".to_string()], timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:AbstractType::Manual("Response from server".to_string()),main_image:Some("https://placehold.jp/1920x1080.png".to_string())},
+        ArticleMetadata{title:"タイトル".to_string(),tags:vec!["aaa".to_string()], timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:AbstractType::Manual("Response from server".to_string()),main_image:Some("https://placehold.jp/1920x1080.png".to_string())},
+        ArticleMetadata{title:"タイトル".to_string(),tags:vec!["aaa".to_string()], timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:AbstractType::Manual("Response from server".to_string()),main_image:Some("https://placehold.jp/1920x1080.png".to_string())},
     ];
     return Ok(data)
 }
