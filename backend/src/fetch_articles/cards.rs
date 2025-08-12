@@ -1,16 +1,18 @@
-use crate::definitions::{ArticleMetadata,AbstractType};
-use serde_json::json;
-use tracing::{debug, info, error};
+use crate::definitions::{ArticleMetadata,AbstractType,RouterStatePayload,CardSortMethod};
+use tracing::{debug,warn, info, error};
 use axum::{
     http::StatusCode,
     response::{IntoResponse,Response},
+    extract
 };
+use futures_util::stream::TryStreamExt;
+use mongodb::bson::doc;
 
 #[axum::debug_handler]
 #[tracing::instrument(name="serve_cards")]
-pub async fn serve_cards()->Result<Response,StatusCode>{
+pub async fn serve_cards(extract::State(payload): extract::State<RouterStatePayload>, extract::Query(sort_method):extract::Query<CardSortMethod>)->Result<Response,StatusCode>{
     info!("cards fetch occured!");
-    let Ok(cards) = fetch_cards().await else{
+    let Ok(cards) = fetch_cards(payload.db_client).await else{
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     };
     let Ok(json_string) = serde_json::to_string(&cards) else{
@@ -20,13 +22,30 @@ pub async fn serve_cards()->Result<Response,StatusCode>{
 }
 
 /// fetch cards and 
-async fn fetch_cards()->Result<Vec<ArticleMetadata>,std::io::Error>{
-    // TODO: use DB
-    let data = vec![
-        ArticleMetadata{title:"タイトル".to_string(),tags:vec!["aaa".to_string()], timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:AbstractType::Manual("Response from server".to_string()),main_image:Some("https://placehold.jp/1920x1080.png".to_string())},
-        ArticleMetadata{title:"タイトル".to_string(),tags:vec!["aaa".to_string()], timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:AbstractType::Manual("Response from server".to_string()),main_image:Some("https://placehold.jp/1920x1080.png".to_string())},
-        ArticleMetadata{title:"タイトル".to_string(),tags:vec!["aaa".to_string()], timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:AbstractType::Manual("Response from server".to_string()),main_image:Some("https://placehold.jp/1920x1080.png".to_string())},
-        ArticleMetadata{title:"タイトル".to_string(),tags:vec!["aaa".to_string()], timestamp:"2000-03-15T05:20:10.123Z".to_string(), abstract_sentense:AbstractType::Manual("Response from server".to_string()),main_image:Some("https://placehold.jp/1920x1080.png".to_string())},
-    ];
-    return Ok(data)
+async fn fetch_cards(db_client: mongodb::Client,sort_method: CardSortMethod)->Result<Vec<ArticleMetadata>,std::io::Error>{
+    let mut limit_num = 4;
+    let filter = match sort_method{
+        CardSortMethod::Latest(num)=>{
+            limit_num = num;
+            doc!{}
+        },
+        CardSortMethod::Tag((tag_id,num))=>{
+            limit_num = num;
+            doc!{"metadata": doc!{"tags": doc!{"$all": tag_id}}}
+        }
+    };
+    let Ok(mut cursor):Result<mongodb::Cursor<ArticleMetadata>, mongodb::error::Error> = db_client.database("test")
+        .collection("articles")
+        .find(filter)
+        .sort(doc!{"id_": 1})
+        .limit(limit_num)
+        .projection(doc!{"metadata":"true"}).await else{
+        error!("failed to fetch cards from db");
+        return Err(std::io::Error::new(std::io::ErrorKind::Other,"failed to fetch cards from db"));
+    };
+    let Ok(cards) = cursor.try_collect().await else{
+        warn!("");
+        return Err(std::io::Error::new(std::io::ErrorKind::Other,"failed to fetch cards from db"));
+    };
+    return Ok(cards)
 }

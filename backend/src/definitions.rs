@@ -30,7 +30,7 @@ pub enum AbstractType{
 #[derive(Serialize,Deserialize)]
 pub struct ArticleMetadata{
     pub title: String,
-    pub tags: Vec<String>,
+    pub tags: Vec<ObjectId>,
     pub timestamp: String,
     pub abstract_sentense: AbstractType,
     pub main_image: Option<String>,
@@ -48,4 +48,10 @@ pub struct ArticlePayload{
 pub struct RouterStatePayload{
     pub time_tx: mpsc::Sender<GetTimeQuery>,
     pub db_client: mongodb::Client,
+}
+
+#[derive(Serialize,Deserialize)]
+pub enum CardSortMethod{
+    Latest(i64),
+    Tag((ObjectId,i64)),
 }
