@@ -34,6 +34,7 @@ async fn main() -> Result<(),std::io::Error>{
         // データの投稿系
         .route("/add_article",post(post_articles::add_article::add_article))
         .route("/add_tag",post(post_articles::add_tag::add_tag))
+        .route("/attach_tag",post(post_articles::attach_tag::attach_tag))
         .with_state(state_payload);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3440").await.unwrap();

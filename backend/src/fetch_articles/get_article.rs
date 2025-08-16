@@ -6,6 +6,7 @@ use axum::{
 };
 use mongodb::bson::doc;
 use crate::definitions::{ArticlePayload,RouterStatePayload};
+use markdown::to_html;
 
 pub async fn get_article(extract::State(payload): extract::State<RouterStatePayload>,extract::Path(article_id): extract::Path<String>)->Result<Html<String>,StatusCode>{
     let filter = doc!{"_id": &article_id};
@@ -20,5 +21,7 @@ pub async fn get_article(extract::State(payload): extract::State<RouterStatePayl
         error!("Requested article was not found: {}",article_id);
         return Err(StatusCode::NOT_FOUND);
     };
-    Ok(Html(article.article))
+
+    let html_article = to_html(&article.article);
+    Ok(Html(html_article))
 }

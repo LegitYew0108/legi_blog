@@ -54,3 +54,9 @@ pub enum CardSortMethod{
     Latest(i64),
     Tag((ObjectId,i64)),
 }
+
+#[derive(Serialize,Deserialize)]
+pub struct ArticleTag{
+    pub article_id: ObjectId,
+    pub tag_id: ObjectId,
+}
