@@ -33,10 +33,10 @@ async fn main() -> Result<(),std::io::Error>{
         .route("/articles/{article_id}", get(fetch_articles::get_article::get_article))
         // データの投稿系
         .route("/add_article",post(post_articles::add_article::add_article))
-        .with_state(state_payload)
-        .route("/add_tag",post(post_articles::add_tag::add_tag));
+        .route("/add_tag",post(post_articles::add_tag::add_tag))
+        .with_state(state_payload);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3440").await.unwrap();
-    axum::serve(listener,app).await.unwrap();
+    axum::serve(listener, app).await.unwrap();
     Ok(())
 }

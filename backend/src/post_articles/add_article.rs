@@ -13,7 +13,6 @@ pub async fn add_article(extract::State(payload): extract::State<RouterStatePayl
     };
     let metadata = ArticleMetadata{
         title: article_payload.title,
-        tags: article_payload.tags,
         timestamp: time.format("%Y-%m-%dT%H:%M:%s.%3fZ").to_string(),
         abstract_sentense: AbstractType::None,
         main_image: None,

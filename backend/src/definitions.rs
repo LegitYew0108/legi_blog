@@ -4,9 +4,10 @@ use tokio::sync::{mpsc, oneshot};
 use mongodb::bson::oid::ObjectId;
 
 #[derive(Serialize,Deserialize)]
-pub struct Tag{
-    id: String,
-    name: String,
+pub struct TagPayload{
+    #[serde(rename = "_id", skip_serializing)]
+    pub id: Option<ObjectId>,
+    pub name: String,
 }
 
 pub struct GetTimeQuery{
@@ -16,7 +17,6 @@ pub struct GetTimeQuery{
 #[derive(Serialize,Deserialize,Debug)]
 pub struct PostArticle{
     pub title: String,
-    pub tags: Vec<String>,
     pub article: String,
 }
 
@@ -30,7 +30,6 @@ pub enum AbstractType{
 #[derive(Serialize,Deserialize)]
 pub struct ArticleMetadata{
     pub title: String,
-    pub tags: Vec<ObjectId>,
     pub timestamp: String,
     pub abstract_sentense: AbstractType,
     pub main_image: Option<String>,
@@ -50,7 +49,7 @@ pub struct RouterStatePayload{
     pub db_client: mongodb::Client,
 }
 
-#[derive(Serialize,Deserialize)]
+#[derive(Serialize,Deserialize,Debug)]
 pub enum CardSortMethod{
     Latest(i64),
     Tag((ObjectId,i64)),
