@@ -25,12 +25,12 @@ pub async fn serve_cards(extract::State(payload): extract::State<RouterStatePayl
 async fn fetch_cards(db_client: mongodb::Client,sort_method: CardSortMethod)->Result<Vec<ArticleMetadata>,std::io::Error>{
     let limit_num;
     let filter = match sort_method{
-        CardSortMethod::Latest(num)=>{
-            limit_num = num;
+        CardSortMethod::Latest{card_num}=>{
+            limit_num = card_num;
             doc!{}
         },
-        CardSortMethod::Tag((tag_id,num))=>{
-            limit_num = num;
+        CardSortMethod::Tag{tag_id,card_num}=>{
+            limit_num = card_num;
             doc!{"metadata": doc!{"tags": doc!{"$all": tag_id}}}
         }
     };
@@ -38,7 +38,7 @@ async fn fetch_cards(db_client: mongodb::Client,sort_method: CardSortMethod)->Re
         .collection("articles")
         .find(filter)
         .sort(doc!{"id_": 1})
-        .limit(limit_num)
+        .limit(limit_num.into())
         .projection(doc!{"metadata":"true"}).await else{
         error!("failed to fetch cards from db");
         return Err(std::io::Error::new(std::io::ErrorKind::Other,"failed to fetch cards from db"));

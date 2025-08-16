@@ -50,9 +50,10 @@ pub struct RouterStatePayload{
 }
 
 #[derive(Serialize,Deserialize,Debug)]
+#[serde(tag = "method")]
 pub enum CardSortMethod{
-    Latest(i64),
-    Tag((ObjectId,i64)),
+    Latest{card_num: u32},
+    Tag{tag_id: ObjectId, card_num: u32},
 }
 
 #[derive(Serialize,Deserialize)]
