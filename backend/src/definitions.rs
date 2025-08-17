@@ -2,6 +2,7 @@ use serde::{Serialize,Deserialize};
 use chrono::prelude::*;
 use tokio::sync::{mpsc, oneshot};
 use mongodb::bson::oid::ObjectId;
+use serde_with::{DisplayFromStr, serde_as};
 
 #[derive(Serialize,Deserialize)]
 pub struct TagPayload{
@@ -49,11 +50,19 @@ pub struct RouterStatePayload{
     pub db_client: mongodb::Client,
 }
 
+#[serde_as]
 #[derive(Serialize,Deserialize,Debug)]
 #[serde(tag = "method")]
 pub enum CardSortMethod{
-    Latest{card_num: u32},
-    Tag{tag_id: ObjectId, card_num: u32},
+    Latest{
+        #[serde_as(deserialize_as = "DisplayFromStr")]
+        card_num: u32
+    },
+    Tag{
+        tag_id: ObjectId,
+        #[serde_as(deserialize_as = "DisplayFromStr")]
+        card_num: u32
+    },
 }
 
 #[derive(Serialize,Deserialize)]
