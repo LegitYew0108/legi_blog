@@ -21,14 +21,14 @@ pub struct PostArticle{
     pub article: String,
 }
 
-#[derive(Serialize,Deserialize)]
+#[derive(Serialize,Deserialize,Clone)]
 pub enum AbstractType{
     None,
     Manual(String),
     Auto(Option<String>),
 }
 
-#[derive(Serialize,Deserialize)]
+#[derive(Serialize,Deserialize,Clone)]
 pub struct ArticleMetadata{
     pub title: String,
     pub timestamp: String,
@@ -42,6 +42,12 @@ pub struct ArticlePayload{
     pub id: Option<ObjectId>,
     pub metadata: ArticleMetadata,
     pub article: String,
+}
+
+#[derive(Serialize,Deserialize)]
+pub struct CardData{
+    pub id: String,
+    pub metadata: ArticleMetadata,
 }
 
 #[derive(Debug,Clone)]

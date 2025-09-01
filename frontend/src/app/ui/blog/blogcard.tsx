@@ -8,15 +8,15 @@ import fetchCards from '@/app/lib/fetch_cards'
 export default async function BlogCard({article}: {article:CardData}){
 	return<div className="relative rounded-4xl m-[2rem] border-2 border-black bg-white transition transition-transform duration-150 hover:scale-105 hover:z-10">
 		<div className="relative rounded-t-4xl h-[60%] overflow-hidden">
-			<Image src={article.image_url} alt={article.title} fill={true}
+			<Image src={article.metadata.main_image} alt={article.metadata.title} fill={true}
 			className="relative! object-cover!" />
 		</div>
-		<p className="text-gray-400">{format(parseJSON(article.timestamp),"yyyy/MM/dd HH:mm ",{locale: ja})}</p>
+		<p className="text-gray-400">{format(parseJSON(article.metadata.timestamp),"yyyy/MM/dd HH:mm ",{locale: ja})}</p>
 		<h1 className="text-[3rem]">
-			{article.title}
+			{article.metadata.title}
 		</h1>
 		<div className="ml-[2rem] mr-[2rem]">
-			{article.abstract_sentense}
+			{article.metadata.abstract_sentense}
 		</div>
 	</div>;
 }
@@ -28,7 +28,7 @@ export async function BlogCards(){
 	}
 	return <>{
 		articles.map((article)=>{
-			return <BlogCard key={article.article_id} article={article} />
+			return <BlogCard key={article.id} article={article} />
 		})
 	}
 	</>

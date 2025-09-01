@@ -1,4 +1,4 @@
-use tracing::error;
+use tracing::{error,info};
 use axum::{
     http::StatusCode,
     extract,
@@ -8,6 +8,8 @@ use crate::definitions::{PostArticle,AbstractType,ArticlePayload,ArticleMetadata
 #[axum::debug_handler]
 #[tracing::instrument(name="add_article")]
 pub async fn add_article(extract::State(payload): extract::State<RouterStatePayload>, extract::Json(article_payload): extract::Json<PostArticle>)->StatusCode{
+    info!("POST article received");
+
     let Ok(time) = crate::utils::time::get_time(payload.time_tx, 5).await else{
         return StatusCode::INTERNAL_SERVER_ERROR;
     };
@@ -31,5 +33,7 @@ pub async fn add_article(extract::State(payload): extract::State<RouterStatePayl
         error!("Error while writing db:{}",e);
         return StatusCode::INTERNAL_SERVER_ERROR;
     };
+
+    info!("successfully store article!");
     return StatusCode::OK;
 }

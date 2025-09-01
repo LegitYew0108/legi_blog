@@ -10,7 +10,8 @@ use axum::{
 };
 use tokio::sync::mpsc;
 use mongodb::{options::ClientOptions, Client};
-
+use dotenv::dotenv;
+use std::env;
 
 #[tokio::main]
 async fn main() -> Result<(),std::io::Error>{
@@ -18,12 +19,18 @@ async fn main() -> Result<(),std::io::Error>{
         .init();
     info!("Server started");
 
-    let client_options = ClientOptions::parse("mongodb://dummy").await.unwrap();
+    // .envファイルの読み込み
+    dotenv().ok();
+
+    // dbのクライアント設定
+    let client_options = ClientOptions::parse(env::var("MONGODB_URI").expect("MONGODB_URI environment variable must be set.")).await.unwrap();
     let db_client = Client::with_options(client_options).unwrap();
 
+    // 時間取得用タスク
     let (time_tx, mut time_rx) = mpsc::channel::<definitions::GetTimeQuery>(32);
     let _time_get_task = tokio::spawn(async move{utils::time::get_time_worker(&mut time_rx).await;});
 
+    // dbと時間取得用タスクを各routeが得るためのstate
     let state_payload = definitions::RouterStatePayload{time_tx: time_tx.clone(),db_client};
 
     let app = Router::new()
