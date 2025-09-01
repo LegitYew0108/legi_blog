@@ -3,12 +3,17 @@ import Image from 'next/image'
 import {parseJSON, format} from 'date-fns'
 import { ja } from 'date-fns/locale';
 import fetchCards from '@/app/lib/fetch_cards'
+import { Elsie_Swash_Caps } from 'next/font/google';
 
 
 export default async function BlogCard({article}: {article:CardData}){
+	let image_data = article.metadata.main_image;
+	if (image_data == null){
+		image_data = "/article_placeholder.png";
+	}
 	return<div className="relative rounded-4xl m-[2rem] border-2 border-black bg-white transition transition-transform duration-150 hover:scale-105 hover:z-10">
 		<div className="relative rounded-t-4xl h-[60%] overflow-hidden">
-			<Image src={article.metadata.main_image} alt={article.metadata.title} fill={true}
+			<Image src={image_data} alt={article.metadata.title} fill={true}
 			className="relative! object-cover!" />
 		</div>
 		<p className="text-gray-400">{format(parseJSON(article.metadata.timestamp),"yyyy/MM/dd HH:mm ",{locale: ja})}</p>
