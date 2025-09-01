@@ -10,3 +10,8 @@ export default interface CardData{
 	id: string;
 	metadata: ArticleMetadata;
 }
+
+export enum CardSortMethod{
+	Latest,
+	Tag,
+}

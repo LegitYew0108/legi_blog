@@ -65,6 +65,7 @@ pub enum CardSortMethod{
         card_num: u32
     },
     Tag{
+        #[serde_as(deserialize_as = "DisplayFromStr")]
         tag_id: ObjectId,
         #[serde_as(deserialize_as = "DisplayFromStr")]
         card_num: u32
