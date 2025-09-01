@@ -2,10 +2,10 @@ import CardData, { CardSortMethod } from '@/app/lib/definitions'
 import Image from 'next/image'
 import {parseJSON, format} from 'date-fns'
 import { ja } from 'date-fns/locale';
-import fetchCards from '@/app/lib/fetch_cards'
+import {fetchCards} from '@/app/lib/fetch_cards'
 
 
-export default async function BlogCard({article}: {article:CardData}){
+export async function BlogCard({article}: {article:CardData}){
 	let image_data = article.metadata.main_image;
 	if (image_data == null){
 		image_data = "/article_placeholder.png";

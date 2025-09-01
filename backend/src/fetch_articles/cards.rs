@@ -53,3 +53,27 @@ async fn fetch_cards(db_client: mongodb::Client,sort_method: CardSortMethod)->Re
 
     return Ok(cards)
 }
+
+#[axum::debug_handler]
+#[tracing::instrument(name="serve_cards")]
+pub async fn serve_cards_num(extract::State(payload): extract::State<RouterStatePayload>)->Result<Response,StatusCode>{
+    info!("cards fetch occured!");
+    let Ok(cards) = fetch_cards_num(payload.db_client).await else{
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    };
+    let Ok(json_string) = serde_json::to_string(&cards) else{
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    };
+    return Ok(json_string.into_response());
+}
+
+async fn fetch_cards_num(db_client: mongodb::Client)->Result<u64,std::io::Error>{
+    let Ok(num):Result<u64, mongodb::error::Error> = db_client.database("test")
+        .collection::<ArticlePayload>("articles")
+        .count_documents(doc!{}).await else{
+        error!("failed to fetch cards from db");
+        return Err(std::io::Error::new(std::io::ErrorKind::Other,"failed to fetch cards from db"));
+    };
+
+    return Ok(num)
+}

@@ -1,8 +1,10 @@
+import { fetchCardsNum } from "@/app/lib/fetch_cards";
+const back_url = "http://localhost:3440"
 
 export default function BlogHeader(){
 	return<header className="flex flex-row items-center bg-gray-400 h-[4rem]">
 		<div className="text-3xl">れぎっとの技術日記(ブログ)</div>
-		<ArticleNum />
+		<ArticleNum back_url={back_url}/>
 		<SearchForm />
 	</header>
 }
@@ -18,8 +20,8 @@ export function SearchForm(){
 		</form>
 }
 
-export function ArticleNum(){
-	const articleNum = 13;
+export async function ArticleNum({back_url}:{back_url:string}){
+	const articleNum = await fetchCardsNum(back_url);
 	return<div className="ml-auto">
 		全記事数：{articleNum}
 	</div>

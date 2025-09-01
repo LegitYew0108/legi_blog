@@ -37,6 +37,7 @@ async fn main() -> Result<(),std::io::Error>{
         .route("/", get(||async {"Server active!"}))
         // データの取得系
         .route("/cards", get(fetch_articles::cards::serve_cards))
+        .route("/cards/number", get(fetch_articles::cards::serve_cards_num))
         .route("/articles/{article_id}", get(fetch_articles::get_article::get_article))
         // データの投稿系
         .route("/add_article",post(post_articles::add_article::add_article))
