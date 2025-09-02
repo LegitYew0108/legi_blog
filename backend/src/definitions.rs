@@ -1,10 +1,79 @@
 use serde::{Serialize,Deserialize};
+use chrono::prelude::*;
+use tokio::sync::{mpsc, oneshot};
+use mongodb::bson::oid::ObjectId;
+use serde_with::{DisplayFromStr, serde_as};
+
+#[derive(Serialize,Deserialize)]
+pub struct TagPayload{
+    #[serde(rename = "_id", skip_serializing)]
+    pub id: Option<ObjectId>,
+    pub name: String,
+}
+
+pub struct GetTimeQuery{
+    pub tx: oneshot::Sender<Result<DateTime<Utc>,std::io::Error>>,
+}
+
+#[derive(Serialize,Deserialize,Debug)]
+pub struct PostArticle{
+    pub title: String,
+    pub article: String,
+}
+
+#[derive(Serialize,Deserialize,Clone)]
+pub enum AbstractType{
+    None,
+    Manual(String),
+    Auto(Option<String>),
+}
+
+#[derive(Serialize,Deserialize,Clone)]
+pub struct ArticleMetadata{
+    pub title: String,
+    pub timestamp: String,
+    pub abstract_sentense: AbstractType,
+    pub main_image: Option<String>,
+}
+
+#[derive(Serialize,Deserialize)]
+pub struct ArticlePayload{
+    #[serde(rename = "_id", skip_serializing)]
+    pub id: Option<ObjectId>,
+    pub metadata: ArticleMetadata,
+    pub article: String,
+}
 
 #[derive(Serialize,Deserialize)]
 pub struct CardData{
-    pub article_id: String,
-    pub image_url: String,
-    pub title: String,
-    pub timestamp: String,
-    pub abstract_sentense: String,
+    pub id: String,
+    pub metadata: ArticleMetadata,
+}
+
+#[derive(Debug,Clone)]
+pub struct RouterStatePayload{
+    pub time_tx: mpsc::Sender<GetTimeQuery>,
+    pub db_client: mongodb::Client,
+}
+
+#[serde_as]
+#[derive(Serialize,Deserialize,Debug)]
+#[serde(tag = "method")]
+pub enum CardSortMethod{
+    Latest{
+        #[serde_as(deserialize_as = "DisplayFromStr")]
+        card_num: u32
+    },
+    Tag{
+        #[serde_as(deserialize_as = "DisplayFromStr")]
+        tag_id: ObjectId,
+        #[serde_as(deserialize_as = "DisplayFromStr")]
+        card_num: u32
+    },
+}
+
+#[derive(Serialize,Deserialize)]
+pub struct ArticleTag{
+    pub article_id: ObjectId,
+    pub tag_id: ObjectId,
 }
